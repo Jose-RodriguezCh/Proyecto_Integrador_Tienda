@@ -47,7 +47,7 @@ class InventarioApp(ctk.CTkToplevel):
         super().__init__(master)
 
         self.title("Menú Principal - Inventario")
-        self.geometry("900x600")
+        self.geometry("1024x768")
 
         self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(0, weight=1)
@@ -66,6 +66,20 @@ class InventarioApp(ctk.CTkToplevel):
             font=ctk.CTkFont(size=20, weight="bold")
         ).grid(row=0, column=0, padx=20, pady=(20, 10))
 
+        # -------------------------
+        # BOTÓN DE VOLVER (CTkButton)
+        # -------------------------
+        btn_volver = ctk.CTkButton(
+            self.sidebar_frame,
+            text="MI TIENDA",
+            fg_color="transparent",
+            hover_color="#175A8E",
+            font=ctk.CTkFont(size=20, weight="bold"),
+            command=lambda: self.mostrar_bienvenida()
+        )
+        btn_volver.grid(row=0, column=0, padx=20, pady=(20, 10))
+
+
         # BOTONES DEL MENÚ LATERAL
         ctk.CTkButton(
             self.sidebar_frame, text="Productos", command=self.abrir_productos
@@ -79,6 +93,9 @@ class InventarioApp(ctk.CTkToplevel):
             self.sidebar_frame, text="Inventario", command=self.abrir_inventario
         ).grid(row=3, column=0, padx=20, pady=10)
 
+        ctk.CTkButton(
+            self.sidebar_frame, text="Salir", command=self.quit
+        ).grid(row=4, column=0, padx=20, pady=400)
         # ---------------------------------------------------------------------
         # CONTENEDOR DERECHO (MAIN FRAME)
         # ---------------------------------------------------------------------
@@ -88,7 +105,8 @@ class InventarioApp(ctk.CTkToplevel):
         self.mostrar_bienvenida()
 
 
-
+    
+        
 
 
 
@@ -131,4 +149,5 @@ class InventarioApp(ctk.CTkToplevel):
         self.cambiar_contenido(proveedores.consultar)
 
     def abrir_inventario(self):
-        print("Abrir inventario...")
+        from view.inventario import inventario
+        self.cambiar_contenido(inventario.consultar)

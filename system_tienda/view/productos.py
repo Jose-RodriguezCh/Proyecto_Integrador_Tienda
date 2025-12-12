@@ -22,7 +22,7 @@ class productos:
     def consultar(ventana):
         productos.borrrarPantalla(ventana)
 
-        titulo = ctk.CTkLabel(ventana, text="·::  Listado de Productos  ::·", font=ctk.CTkFont(size=26, weight="bold"))
+        titulo = ctk.CTkLabel(ventana, text="Listado de Productos", font=ctk.CTkFont(size=26, weight="bold"))
         titulo.pack(pady=20)
 
         cursor = pm.productos.consultar()
@@ -68,7 +68,7 @@ class productos:
     def agregar(ventana):
         productos.borrrarPantalla(ventana)
 
-        titulo = ctk.CTkLabel(ventana, text="·::  Agregar Nuevo Producto  ::·", font=ctk.CTkFont(size=26, weight="bold"))
+        titulo = ctk.CTkLabel(ventana, text="Agregar Nuevo Producto", font=ctk.CTkFont(size=26, weight="bold"))
         titulo.pack(pady=20)
 
         # Frame para el formulario
@@ -116,7 +116,7 @@ class productos:
     def cambiar(ventana):
         productos.borrrarPantalla(ventana)
 
-        titulo = ctk.CTkLabel(ventana, text="·::  Modificar Producto  ::·", font=ctk.CTkFont(size=26, weight="bold"))
+        titulo = ctk.CTkLabel(ventana, text="Modificar Producto", font=ctk.CTkFont(size=26, weight="bold"))
         titulo.pack(pady=10)
 
         info_lbl = ctk.CTkLabel(ventana, text="Ingrese el ID del producto a modificar y los nuevos valores", text_color="gray")
@@ -163,7 +163,7 @@ class productos:
     def borrar(ventana):
         productos.borrrarPantalla(ventana)
 
-        titulo = ctk.CTkLabel(ventana, text="·::  Eliminar Producto  ::·", font=ctk.CTkFont(size=26, weight="bold"))
+        titulo = ctk.CTkLabel(ventana, text="Eliminar Producto", font=ctk.CTkFont(size=26, weight="bold"))
         titulo.pack(pady=20)
 
         form_frame = ctk.CTkFrame(ventana)

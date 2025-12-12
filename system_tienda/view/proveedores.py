@@ -23,7 +23,7 @@ class proveedores:
 
         titulo = ctk.CTkLabel(
             ventana,
-            text="·::  Listado de Proveedores  ::·",
+            text="Listado de Proveedores",
             font=ctk.CTkFont(size=26, weight="bold")
         )
         titulo.pack(pady=20)
@@ -87,7 +87,7 @@ class proveedores:
 
         titulo = ctk.CTkLabel(
             ventana,
-            text="·::  Agregar Nuevo Proveedor  ::·",
+            text="Agregar Nuevo Proveedor",
             font=ctk.CTkFont(size=26, weight="bold")
         )
         titulo.pack(pady=20)
@@ -135,7 +135,7 @@ class proveedores:
 
         titulo = ctk.CTkLabel(
             ventana,
-            text="·::  Modificar Proveedor  ::·",
+            text="Modificar Proveedor",
             font=ctk.CTkFont(size=26, weight="bold")
         )
         titulo.pack(pady=10)
@@ -188,7 +188,7 @@ class proveedores:
 
         titulo = ctk.CTkLabel(
             ventana,
-            text="·::  Eliminar Proveedor  ::·",
+            text="Eliminar Proveedor",
             font=ctk.CTkFont(size=26, weight="bold")
         )
         titulo.pack(pady=20)

@@ -2,8 +2,9 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 import tkinter.font as tkFont
+from model import productos_model as pm
 from model import inventario_model as im
-
+import customtkinter as ctk
 from view import usuarios as usu
 
 class inventario:
@@ -28,48 +29,121 @@ class inventario:
         inventarioMenu.add_separator()
         inventarioMenu.add_command(label="salir",command=ventana.quit)
 
+    # --------------------------------------------------------------------------
+    # 1. CONSULTAR
+    # --------------------------------------------------------------------------
     @staticmethod
     def consultar(ventana):
         inventario.borrrarPantalla(ventana)
-        usu.usuarios.menuPrincipal(ventana)
-        titulo=Label(ventana,text=".::Listado de inventario::.")
-        titulo.pack(pady=10)
-        cursor=im.inventario.consultar()
-        if len(cursor)>0:
-            columnas=("ID","Lista","Fecha de actualizacion","ID del producto")
-            style = ttk.Style()
-            style.theme_use("default")
-            # Header style
-            style.configure("Treeview.Heading",
-                            background="#d9d9d9",
-                            relief="solid",
-                            borderwidth=1,
-                            padding=(6, 4))
+
+        titulo = ctk.CTkLabel(
+            ventana,
+            text="Reporte de inventario",
+            font=ctk.CTkFont(size=26, weight="bold")
+        )
+        titulo.pack(pady=20)
+
+        cursor = pm.productos.consultar()
+
+        if len(cursor) > 0:
+            contar=im.inventario.consultar()
+
+            # --- NUEVO CONTENEDOR PARA LOS TOTALES (Alineado a la izquierda) ---
+            frame_totales = ctk.CTkFrame(ventana, fg_color="transparent")
+            # Asegura que el frame ocupe todo el ancho de la ventana y esté a la izquierda
+            frame_totales.pack(fill="x", padx=40, pady=20, anchor="w")
             
-            inventario_tree=ttk.Treeview(ventana,columns=columnas,show="headings")
-            for i in columnas:
-                inventario_tree.heading(i,text=i)
-            for col in inventario_tree["columns"]:
-                inventario_tree.column(col, stretch=True)
+            # --- LABEL DE INVERSIÓN TOTAL ---
+            pc = ctk.CTkLabel(
+                frame_totales, # <- Ahora el master es frame_totales
+                text=f"Inversión Total \n\n${contar[0][0]}\n", # Añadido formato .2f
+                font=ctk.CTkFont(size=20, weight="bold", slant="roman"),
+                anchor="w",    # Alinea el texto a la izquierda DENTRO del label
+                justify="left"
+            )
+            # Empaqueta el label para que ocupe todo el ancho del frame
+            pc.pack(fill="x", expand=True, pady=10)
+            
+            # --- LABEL DE GANANCIAS ---
+            pv = ctk.CTkLabel(
+                frame_totales, # <- Ahora el master es frame_totales
+                text=f"Venta total estimada \n\n${contar[0][1]}\n", # Añadido formato .2f
+                font=ctk.CTkFont(size=20, weight="bold", slant="roman"),
+                anchor="w",    # Alinea el texto a la izquierda DENTRO del label
+                justify="left"
+            )
+            # Empaqueta el label para que ocupe todo el ancho del frame
+            pv.pack(fill="x", expand=True, pady=10)
+            # --- LABEL DE Stock ---
+            tp = ctk.CTkLabel(
+                frame_totales, # <- Ahora el master es frame_totales
+                text=f"Total de productos \n\n{round(contar[0][2])}\n", # Añadido formato .2f
+                font=ctk.CTkFont(size=20, weight="bold", slant="roman"),
+                anchor="w",    # Alinea el texto a la izquierda DENTRO del label
+                justify="left"
+            )
+            # Empaqueta el label para que ocupe todo el ancho del frame
+            tp.pack(fill="x", expand=True, pady=10)
 
-            font = tkFont.Font()
-            for col in columnas:
-                max_width = font.measure(col)
-                for row in inventario_tree.get_children():
-                    cell = inventario_tree.set(row, col)
-                    cell_width = font.measure(cell)
-                    if cell_width > max_width:
-                        max_width = cell_width
-                inventario_tree.column(col, width=max_width + 20, stretch=True)
+            # --- LABEL DE PRODUCTOS CON STOCK MENOR A 10 ---
+            agotados=im.inventario.consultarProd_ago()
+            res=""
+            for i in agotados:
+                res+=f"Nombre: {i[0]} - Cantidad: {i[1]}\n"
+            ag = ctk.CTkLabel(
+                frame_totales, # <- Ahora el master es frame_totales
+                text=f"Productos cerca de agotarse \n\n{res}\n", # Añadido formato .2f
+                font=ctk.CTkFont(size=20, weight="bold", slant="roman"),
+                anchor="w",    # Alinea el texto a la izquierda DENTRO del label
+                justify="left"
+            )
+            # Empaqueta el label para que ocupe todo el ancho del frame
+            ag.pack(fill="x", expand=True, pady=10)
+            # ------------------------------------------------------------------
 
-            inventario_tree.pack(fill=BOTH,expand=True,padx=200,pady=(0,100))
-            for i in cursor:
-                inventario_tree.insert("",END,values=i)
         else:
-            messagebox.showinfo(title="Error",message="No existe nada de inventario guardado en la BD...",icon="info")
-                #Aqui iria una ruta a la pagina principal, despues del login del principio
-                #Este mensaje se supone que no deberia de ejecutarse, ya que como accedes en primer
-                #lugar a la app si no hay usuarios?
-        
-        btn_volver=Button(ventana,text="Volver",command="")
-        btn_volver.pack(pady=5)
+            ctk.CTkLabel(ventana, text="No hay productos registrados.", font=ctk.CTkFont(size=16)).pack(pady=20)
+
+            # columnas = ("ID", "Nombre", "Telefono", "Direccion")
+
+            # # Frame contenedor para Treeview y Scrollbar
+            # tree_frame = ctk.CTkFrame(ventana, fg_color="transparent")
+            # tree_frame.pack(fill=BOTH, expand=True, padx=20, pady=(0, 20))
+
+            # proveedores_tree = ttk.Treeview(
+            #     tree_frame,
+            #     columns=columnas,
+            #     show="headings",
+            #     height=12
+            # )
+
+            # # Scrollbar
+            # scrollbar = ttk.Scrollbar(tree_frame, orient="vertical", command=proveedores_tree.yview)
+            # proveedores_tree.configure(yscroll=scrollbar.set)
+            # scrollbar.pack(side="right", fill="y")
+            # proveedores_tree.pack(side="left", fill=BOTH, expand=True)
+
+            # # Estilos
+            # style = ttk.Style()
+            # style.theme_use("default")
+            # style.configure(
+            #     "Treeview",
+            #     background="#F0F0F0",
+            #     foreground="black",
+            #     rowheight=28,
+            #     fieldbackground="#F0F0F0"
+            # )
+            # style.configure(
+            #     "Treeview.Heading",
+            #     background="#D1D5DB",
+            #     foreground="black",
+            #     font=("Arial", 12, "bold")
+            # )
+
+            # for col in columnas:
+            #     proveedores_tree.heading(col, text=col)
+            #     proveedores_tree.column(col, width=150, anchor="center")
+
+            # # Insertar datos
+            # for row in cursor:
+            #     proveedores_tree.insert("", END, values=row)
