@@ -33,6 +33,11 @@ class productos:
     def actualizarUno(id_producto,cantidad):
         res=pm.productos.actualizarUno(id_producto,cantidad)
         return res
+    
+    @staticmethod
+    def buscar_id(id_prod):
+        res=pm.productos.buscar_id(id_prod)
+        return res
 
 class proveedores:
     @staticmethod
@@ -43,6 +48,7 @@ class proveedores:
     @staticmethod
     def agregar(nom,tel,dir_):
         res=prm.proveedores.insertarProveedor(nom,tel,dir_)
+        return res
 
     @staticmethod
     def actualizar(nom,tel,dir_,id_prov):
@@ -50,9 +56,11 @@ class proveedores:
         return res
     
     @staticmethod
-    def eliminar(id_prov):
-        res=prm.proveedores.eliminar(id_prov)
+    def buscar_id(id_prod):
+        res=prm.proveedores.buscar_id(id_prod)
         return res
+    
+
 
 class ventas:
     @staticmethod

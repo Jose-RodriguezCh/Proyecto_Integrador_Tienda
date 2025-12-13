@@ -17,7 +17,16 @@ class productos:
         except:
             return []
 
-
+    @staticmethod
+    def buscar_id(id_prov):
+      try:
+        cursor.execute(
+          "select * from productos where id_producto=%s",
+          (id_prov,)
+        )
+        return cursor.fetchone()
+      except:    
+        return []
 
 
     @staticmethod

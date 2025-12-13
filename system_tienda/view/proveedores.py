@@ -125,13 +125,44 @@ class proveedores:
         )
         btn_guardar.pack(pady=20)
 
-    
+    #Buscar
+    @staticmethod
+    def buscar_id(ventana):
+        proveedores.borrrarPantalla(ventana)
+
+        titulo = ctk.CTkLabel(ventana, text="Buscar Proveedor", font=ctk.CTkFont(size=26, weight="bold"))
+        titulo.pack(pady=20)
+
+        form_frame = ctk.CTkFrame(ventana)
+        form_frame.pack(pady=20)
+
+        entry_id = proveedores._crear_campo(form_frame, "ID del Proveedor a Buscar:", 0)
+
+        def buscarProveedor():
+            try:
+                id_prov = int(entry_id.get())
+                exito = controller.proveedores.buscar_id(id_prov)
+                if exito:
+                    messagebox.showinfo("Exito","Proveedor encontrado")
+                    proveedores.cambiar(ventana,id_prov)
+                else:
+                    messagebox.showerror("Error", "No se encontró el ID o hubo un error.")
+            except ValueError:
+                messagebox.showerror("Error", "El ID debe ser un número entero.")
+
+        btn_buscar = ctk.CTkButton(ventana, text="Buscar Proveedor", fg_color="#2CC985", hover_color="#229A65", command=buscarProveedor)
+        btn_buscar.pack(pady=20)
+
+
+
+
+
     # 3. CAMBIAR / EDITAR
    
     @staticmethod
-    def cambiar(ventana):
+    def cambiar(ventana,id_prov):
         proveedores.borrrarPantalla(ventana)
-
+        registro=controller.proveedores.buscar_id(id_prov)
         titulo = ctk.CTkLabel(
             ventana,
             text="Modificar Proveedor",
@@ -139,17 +170,18 @@ class proveedores:
         )
         titulo.pack(pady=10)
         
-        lbl_info = ctk.CTkLabel(ventana, text="Ingrese el ID del proveedor a modificar y los nuevos datos", text_color="gray")
+        lbl_info = ctk.CTkLabel(ventana, text="Ingrese los nuevos datos del proveedor", text_color="gray")
         lbl_info.pack(pady=(0,10))
 
         form_frame = ctk.CTkFrame(ventana)
         form_frame.pack(pady=10, padx=20)
 
         # Campos necesarios: ID (para el WHERE) y los datos nuevos
-        entry_id = proveedores._crear_campo(form_frame, "ID Proveedor a Modificar:", 0)
-        entry_nombre = proveedores._crear_campo(form_frame, "Nuevo Nombre:", 1)
-        entry_telefono = proveedores._crear_campo(form_frame, "Nuevo Teléfono:", 2)
-        entry_direccion = proveedores._crear_campo(form_frame, "Nueva Dirección:", 3)
+        entry_id = proveedores._crear_campo1(form_frame, "ID Proveedor a Modificar:",registro[0], 0)
+        entry_id.configure(state="disabled")
+        entry_nombre = proveedores._crear_campo1(form_frame, "Nuevo Nombre:",registro[1], 1)
+        entry_telefono = proveedores._crear_campo1(form_frame, "Nuevo Teléfono:",registro[2], 2)
+        entry_direccion = proveedores._crear_campo1(form_frame, "Nueva Dirección:",registro[3], 3)
 
         def actualizar_datos():
             try:
@@ -179,47 +211,6 @@ class proveedores:
         btn_actualizar.pack(pady=20)
 
     
-    # 4. BORRAR
-    
-    @staticmethod
-    def borrar(ventana):
-        proveedores.borrrarPantalla(ventana)
-
-        titulo = ctk.CTkLabel(
-            ventana,
-            text="Eliminar Proveedor",
-            font=ctk.CTkFont(size=26, weight="bold")
-        )
-        titulo.pack(pady=20)
-
-        form_frame = ctk.CTkFrame(ventana)
-        form_frame.pack(pady=20)
-
-        entry_id = proveedores._crear_campo(form_frame, "ID del Proveedor a Eliminar:", 0)
-
-        def eliminar_datos():
-            try:
-                id_prov = int(entry_id.get())
-                confirm = messagebox.askyesno("Confirmar", f"¿Está seguro de eliminar al proveedor con ID {id_prov}?")
-                
-                if confirm:
-                    exito = controller.proveedores.eliminar(id_prov)
-                    if exito:
-                        messagebox.showinfo("Éxito", "Proveedor eliminado.")
-                        proveedores.consultar(ventana)
-                    else:
-                        messagebox.showerror("Error", "No se encontró el ID o hubo un error.")
-            except ValueError:
-                messagebox.showerror("Error", "El ID debe ser un número entero.")
-
-        btn_eliminar = ctk.CTkButton(
-            ventana, 
-            text="Eliminar Definitivamente", 
-            fg_color="#D32F2F", 
-            hover_color="#B71C1C", 
-            command=eliminar_datos
-        )
-        btn_eliminar.pack(pady=20)
 
    
     # HELPER
@@ -230,4 +221,13 @@ class proveedores:
         lbl.grid(row=fila, column=0, padx=10, pady=5, sticky="e")
         entry = ctk.CTkEntry(parent, width=200)
         entry.grid(row=fila, column=1, padx=10, pady=5)
+        return entry
+    
+    @staticmethod
+    def _crear_campo1(parent, texto,settt, fila):
+        lbl = ctk.CTkLabel(parent, text=texto, font=("Arial", 14))
+        lbl.grid(row=fila, column=0, padx=10, pady=5, sticky="e")
+        entry = ctk.CTkEntry(parent, width=200)
+        entry.grid(row=fila, column=1, padx=10, pady=5)
+        entry.insert(0, settt)
         return entry

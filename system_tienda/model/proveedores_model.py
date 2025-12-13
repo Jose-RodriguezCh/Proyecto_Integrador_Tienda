@@ -20,6 +20,16 @@ class proveedores:
         except:
             return False
 
+    @staticmethod
+    def buscar_id(id_prov):
+      try:
+        cursor.execute(
+          "select * from proveedores where id_proveedor=%s",
+          (id_prov,)
+        )
+        return cursor.fetchone()
+      except:    
+        return []
 
     @staticmethod
     def actualizar(nombre,telefono,direccion,id):
@@ -30,17 +40,3 @@ class proveedores:
         except:
             return False
     
-    @staticmethod
-    def eliminar(id):
-        try:
-            res=[]
-            cursor.execute("SELECT * FROM proveedores WHERE id_proveedor=%s",(id,))
-            res=cursor.fetchall()
-            if len(res)>0:
-                cursor.execute("DELETE FROM proveedores WHERE id_proveedor=%s",(id,))
-                conexion.commit()
-                return True
-            else:
-                print(f"No se encontro una nota con el id {id}")
-        except:
-            return False

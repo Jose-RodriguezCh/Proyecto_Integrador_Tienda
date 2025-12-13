@@ -16,7 +16,7 @@ class ventas    :
             cursor.execute("SELECT * FROM ventas WHERE id_ventas=%s",(id,))
             res=cursor.fetchall()
             if len(res)>0:
-                cursor.execute("DELETE FROM proveedores WHERE id_ventas=%s",(id,))
+                cursor.execute("DELETE FROM ventas WHERE id_ventas=%s",(id,))
                 conexion.commit()
                 return True
             else:
@@ -27,7 +27,7 @@ class ventas    :
     @staticmethod
     def buscar_por_id(id_venta):
         try:
-            cursor.execute("SELECT * FROM ventas WHERE id_ventas = %s",(id_venta))
+            cursor.execute("SELECT * FROM ventas WHERE id_ventas = %s",(id_venta,))
             venta = cursor.fetchone()
             return venta 
         except:

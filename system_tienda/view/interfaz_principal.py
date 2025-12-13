@@ -18,8 +18,8 @@ def crear_menu_bar_Productos(ventana):
 
         productosMenu.add_command(label="Agregar", command=lambda: pro.productos.agregar(ventana))
         productosMenu.add_command(label="Consultar", command=lambda: pro.productos.consultar(ventana))
-        productosMenu.add_command(label="Cambiar", command=lambda: pro.productos.cambiar(ventana))
-        productosMenu.add_command(label="Borrar", command=lambda: pro.productos.borrar(ventana))
+        productosMenu.add_command(label="Cambiar", command=lambda: pro.productos.buscar_id(ventana,"cambiar"))
+        productosMenu.add_command(label="Borrar", command=lambda: pro.productos.buscar_id(ventana,"borrar"))
         productosMenu.add_separator()
         productosMenu.add_command(label="Salir", command=ventana.quit)
 
@@ -35,8 +35,7 @@ def crear_menu_bar_Provedores(ventana):
 
         provedoresMenu.add_command(label="Agregar", command=lambda: pree.proveedores.agregar(ventana))
         provedoresMenu.add_command(label="Consultar", command=lambda: pree.proveedores.consultar(ventana))
-        provedoresMenu.add_command(label="Cambiar", command=lambda: pree.proveedores.cambiar(ventana))
-        provedoresMenu.add_command(label="Borrar", command=lambda: pree.proveedores.borrar(ventana))
+        provedoresMenu.add_command(label="Cambiar", command=lambda: pree.proveedores.buscar_id(ventana))
         provedoresMenu.add_separator()
         provedoresMenu.add_command(label="Salir", command=ventana.quit)
 

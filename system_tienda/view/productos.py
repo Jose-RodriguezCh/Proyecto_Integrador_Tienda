@@ -75,12 +75,12 @@ class productos:
         form_frame.pack(pady=10, padx=20)
 
         # Entradas
-        entry_nombre = productos._crear_campo(form_frame, "Nombre:", 0)
-        entry_categoria = productos._crear_campo(form_frame, "Categoría:", 1)
-        entry_p_compra = productos._crear_campo(form_frame, "Precio Compra:", 2)
-        entry_p_venta = productos._crear_campo(form_frame, "Precio Venta:", 3)
-        entry_stock = productos._crear_campo(form_frame, "Stock:", 4)
-        entry_prov_id = productos._crear_campo(form_frame, "ID Proveedor:", 5)
+        entry_nombre = productos._crear_campo1(form_frame, "Nombre:", 0)
+        entry_categoria = productos._crear_campo1(form_frame, "Categoría:", 1)
+        entry_p_compra = productos._crear_campo1(form_frame, "Precio Compra:", 2)
+        entry_p_venta = productos._crear_campo1(form_frame, "Precio Venta:", 3)
+        entry_stock = productos._crear_campo1(form_frame, "Stock:", 4)
+        entry_prov_id = productos._crear_campo1(form_frame, "ID Proveedor:", 5)
 
         def guardar_datos():
             try:
@@ -108,29 +108,73 @@ class productos:
         btn_guardar = ctk.CTkButton(ventana, text="Guardar Producto", fg_color="#2CC985", hover_color="#229A65", command=guardar_datos)
         btn_guardar.pack(pady=20)
 
-    
-    # 3. CAMBIAR
     @staticmethod
-    def cambiar(ventana):
+    def buscar_id(ventana,tipo):
         productos.borrrarPantalla(ventana)
 
+        titulo = ctk.CTkLabel(ventana, text="Buscar Producto", font=ctk.CTkFont(size=26, weight="bold"))
+        titulo.pack(pady=20)
+
+        form_frame = ctk.CTkFrame(ventana)
+        form_frame.pack(pady=20)
+
+        entry_id = productos._crear_campo1(form_frame, "ID del Producto a Buscar:", 0)
+
+        def buscarProducto():
+            try:
+                id_prod = int(entry_id.get())
+                exito = controller.productos.buscar_id(id_prod)
+                if exito:
+                    messagebox.showinfo("Exito","Producto encontrado")
+                    if tipo=="cambiar":
+                        productos.cambiar(ventana,id_prod)
+                    elif tipo=="borrar":
+                        productos.borrar(ventana,id_prod)
+                else:
+                    messagebox.showerror("Error", "No se encontró el ID o hubo un error.")
+            except ValueError:
+                messagebox.showerror("Error", "El ID debe ser un número entero.")
+
+        btn_buscar = ctk.CTkButton(ventana, text="Buscar Producto", fg_color="#2CC985", hover_color="#229A65", command=buscarProducto)
+        btn_buscar.pack(pady=20)
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+    # 3. CAMBIAR
+    @staticmethod
+    def cambiar(ventana,id_prod):
+        productos.borrrarPantalla(ventana)
+        registro=controller.productos.buscar_id(id_prod)
         titulo = ctk.CTkLabel(ventana, text="Modificar Producto", font=ctk.CTkFont(size=26, weight="bold"))
         titulo.pack(pady=10)
 
-        info_lbl = ctk.CTkLabel(ventana, text="Ingrese el ID del producto a modificar y los nuevos valores", text_color="gray")
+        info_lbl = ctk.CTkLabel(ventana, text="Ingrese los nuevos valores del producto", text_color="gray")
         info_lbl.pack(pady=(0,10))
 
         form_frame = ctk.CTkFrame(ventana)
         form_frame.pack(pady=10, padx=20)
 
         # Campos
-        entry_id = productos._crear_campo(form_frame, "ID Producto a Modificar:", 0)
-        entry_nombre = productos._crear_campo(form_frame, "Nuevo Nombre:", 1)
-        entry_categoria = productos._crear_campo(form_frame, "Nueva Categoría:", 2)
-        entry_p_compra = productos._crear_campo(form_frame, "Nuevo Precio Compra:", 3)
-        entry_p_venta = productos._crear_campo(form_frame, "Nuevo Precio Venta:", 4)
-        entry_stock = productos._crear_campo(form_frame, "Nuevo Stock:", 5)
-        entry_prov_id = productos._crear_campo(form_frame, "Nuevo ID Proveedor:", 6)
+        entry_id = productos._crear_campo(form_frame, "ID Producto a Modificar:",registro[0], 0)
+        entry_id.configure(state="disabled")
+        entry_nombre = productos._crear_campo(form_frame, "Nuevo Nombre:",registro[1], 1)
+        entry_categoria = productos._crear_campo(form_frame, "Nueva Categoría:",registro[2], 2)
+        entry_p_compra = productos._crear_campo(form_frame, "Nuevo Precio Compra:",registro[3], 3)
+        entry_p_venta = productos._crear_campo(form_frame, "Nuevo Precio Venta:",registro[4], 4)
+        entry_stock = productos._crear_campo(form_frame, "Nuevo Stock:",registro[5], 5)
+        entry_prov_id = productos._crear_campo(form_frame, "Nuevo ID Proveedor:",registro[6], 6)
 
         def actualizar_datos():
             try:
@@ -158,20 +202,19 @@ class productos:
     # 4. BORRAR 
     
     @staticmethod
-    def borrar(ventana):
+    def borrar(ventana,id_prod):
         productos.borrrarPantalla(ventana)
-
         titulo = ctk.CTkLabel(ventana, text="Eliminar Producto", font=ctk.CTkFont(size=26, weight="bold"))
         titulo.pack(pady=20)
 
         form_frame = ctk.CTkFrame(ventana)
         form_frame.pack(pady=20)
 
-        entry_id = productos._crear_campo(form_frame, "ID del Producto a Eliminar:", 0)
+        entry_id = productos._crear_campo(form_frame, "ID del Producto a Eliminar:",id_prod, 0)
+        entry_id.configure(state="disabled")
 
         def eliminar_datos():
             try:
-                id_prod = int(entry_id.get())
                 confirm = messagebox.askyesno("Confirmar", f"¿Está seguro de eliminar el producto ID {id_prod}?")
                 if confirm:
                     exito = controller.productos.eliminar(id_prod)
@@ -188,11 +231,19 @@ class productos:
 
     
     # HELPER: Para crear labels y entrys rápido
-    
     @staticmethod
-    def _crear_campo(parent, texto, fila):
+    def _crear_campo1(parent, texto, fila):
         lbl = ctk.CTkLabel(parent, text=texto, font=("Arial", 14))
         lbl.grid(row=fila, column=0, padx=10, pady=5, sticky="e")
         entry = ctk.CTkEntry(parent, width=200)
         entry.grid(row=fila, column=1, padx=10, pady=5)
+        return entry
+    
+    @staticmethod
+    def _crear_campo(parent, texto,settt, fila):
+        lbl = ctk.CTkLabel(parent, text=texto, font=("Arial", 14))
+        lbl.grid(row=fila, column=0, padx=10, pady=5, sticky="e")
+        entry = ctk.CTkEntry(parent, width=200)
+        entry.grid(row=fila, column=1, padx=10, pady=5)
+        entry.insert(0, settt)
         return entry

@@ -149,7 +149,13 @@ class ventas:
             if not pid or not cant:
                 messagebox.showwarning("Datos", "Ingresa ID y Cantidad")
                 return
-
+            try:
+                cantidad_int = int(cant)
+                if cantidad_int <= 0:
+                    raise ValueError
+            except ValueError:
+                messagebox.showwarning("Cantidad", "La cantidad debe ser un número entero positivo.")
+                return
             producto_encontrado = None
             respuesta=False
             for item in lista_productos_bd:
@@ -165,14 +171,6 @@ class ventas:
             if producto_encontrado:
                 nombre = producto_encontrado[1]
                 precio = float(producto_encontrado[4]) # Precio Venta
-                
-                try:
-                    cantidad_int = int(cant)
-                    if cantidad_int <= 0:
-                        raise ValueError
-                except ValueError:
-                    messagebox.showwarning("Cantidad", "La cantidad debe ser un número entero positivo.")
-                    return
 
                 subtotal = precio * cantidad_int
                 contt = 0
@@ -314,50 +312,55 @@ class ventas:
                 messagebox.showwarning("Vacío", "El carrito está vacío.")
                 return
 
+            try:
+                pago = float(entry_pago.get()) if entry_pago.get() else 0
+                cambio_txt = entry_cambio.get().replace("$", "")
+                cambio = float(cambio_txt) if cambio_txt not in ["Falta dinero", ""] else 0
 
-            pago = float(entry_pago.get()) if entry_pago.get() else 0
-            cambio_txt = entry_cambio.get().replace("$", "")
-            cambio = float(cambio_txt) if cambio_txt not in ["Falta dinero", ""] else 0
+                if pago>=float(total):
+                    # INSERT - UNA FILA POR PRODUCTO
+                    lista_prod=""
+                    lista_cantidad=""
+                    for item in carrito_tree.get_children():
+                        valores = carrito_tree.item(item)["values"]
 
-            # INSERT - UNA FILA POR PRODUCTO
-            lista_prod=""
-            lista_cantidad=""
-            for item in carrito_tree.get_children():
-                valores = carrito_tree.item(item)["values"]
-
-                producto = valores[1]
-                cantidad = valores[3]
-                lista_prod+=f"{producto}\n"
-                lista_cantidad+=f"{cantidad}\n"
+                        producto = valores[1]
+                        cantidad = valores[3]
+                        lista_prod+=f"{producto}\n"
+                        lista_cantidad+=f"{cantidad}\n"
 
 
-            res=controller.ventas.insertar(
-                lista_prod,
-                lista_cantidad,
-                total,
-                pago,
-                cambio
-            )
-            if res:
-                for item in carrito_tree.get_children():
-                    valores = carrito_tree.item(item)["values"]
-                    id_producto = int(valores[0])
-                    cantidad_vendida = int(valores[3])
+                    res=controller.ventas.insertar(
+                        lista_prod,
+                        lista_cantidad,
+                        total,
+                        pago,
+                        cambio
+                    )
+                    if res:
+                        for item in carrito_tree.get_children():
+                            valores = carrito_tree.item(item)["values"]
+                            id_producto = int(valores[0])
+                            cantidad_vendida = int(valores[3])
 
-                    # Buscar producto en la lista de productos
-                    for j in lista_productos_bd:
-                        if int(j[0]) == id_producto:
-                            nuevo_stock = j[5] - cantidad_vendida  # j[5] = stock actual
-                            controller.productos.actualizarUno(id_producto, nuevo_stock)
-                            break
-                
+                            # Buscar producto en la lista de productos
+                            for j in lista_productos_bd:
+                                if int(j[0]) == id_producto:
+                                    nuevo_stock = j[5] - cantidad_vendida  # j[5] = stock actual
+                                    controller.productos.actualizarUno(id_producto, nuevo_stock)
+                                    break
+                        
 
-            messagebox.showinfo("Venta", f"Venta exitosa por ${total}")
-            # Limpiar todo
-            carrito_tree.delete(*carrito_tree.get_children())
-            entry_pago.delete(0, END)
-            # Llamamos a cancelar venta para reutilizar la lógica de limpieza
-            cancelar_venta() 
+                    messagebox.showinfo("Venta", f"Venta exitosa por ${total}")
+                    # Limpiar todo
+                    carrito_tree.delete(*carrito_tree.get_children())
+                    entry_pago.delete(0, END)
+                else:
+                    messagebox.showinfo("Venta", f"Falta ${float(total)-pago} para completar el pago",icon="warning")
+                # Llamamos a cancelar venta para reutilizar la lógica de limpieza
+            except ValueError:
+                messagebox.showerror("Error", "Solo se aceptan numeros")
+            
 
         # BOTÓN CANCELAR VENTA
         btn_cancelar = ctk.CTkButton(right_frame, text="CANCELAR VENTA", fg_color="#FF4136", hover_color="#CC0000", height=40, font=("Arial", 14, "bold"), command=cancelar_venta)
@@ -491,32 +494,41 @@ class ventas:
                 messagebox.showerror("Error", "Debes ingresar un ID válido.")
                 return
 
-            venta = controller.ventas.buscar_id(id_venta)
+            try:
+                cantidad_int = int(id_venta)
+                if cantidad_int <= 0:
+                    raise ValueError
+            except ValueError:
+                messagebox.showwarning("Cantidad", "La cantidad debe ser un número entero positivo.")
+                return
+            
+            venta = controller.ventas.buscar_id(int(id_venta))
 
             if venta is None:
                 messagebox.showerror("Error", "No existe una venta con ese ID.")
                 return
+            else:
 
-            # Mostrar datos en alerta
-            datos = (
-                f"ID Venta: {venta[0]}\n"
-                f"Productos: {venta[1]}\n"
-                f"Cantidad: {venta[2]}\n"
-                f"Total: ${venta[3]}\n"
-                f"Pago: ${venta[4]}\n"
-                f"Cambio: ${venta[5]}\n"
-                f"Fecha: {venta[6]}"
-            )
+                # Mostrar datos en alerta
+                datos = (
+                    f"ID Venta: {venta[0]}\n"
+                    f"Productos: {venta[1]}\n"
+                    f"Cantidad: {venta[2]}\n"
+                    f"Total: ${venta[3]}\n"
+                    f"Pago: ${venta[4]}\n"
+                    f"Cambio: ${venta[5]}\n"
+                    f"Fecha: {venta[6]}"
+                )
 
-            respuesta = messagebox.askyesno(
-                "Confirmar eliminación",
-                f"¿Seguro que deseas eliminar esta venta?\n\n{datos}"
-            )
+                respuesta = messagebox.askyesno(
+                    "Confirmar eliminación",
+                    f"¿Seguro que deseas eliminar esta venta?\n\n{datos}"
+                )
 
-            if respuesta:
-                controller.ventas.eliminar(id_venta)
-                messagebox.showinfo("Éxito", "La venta ha sido eliminada.")
-                ventas.borrar(ventana)  # recargar la interfaz
+                if respuesta:
+                    controller.ventas.eliminar(id_venta)
+                    messagebox.showinfo("Éxito", "La venta ha sido eliminada.")
+                    ventas.consultar(ventana)  # recargar la interfaz
 
         btn = ctk.CTkButton(
             frame,
