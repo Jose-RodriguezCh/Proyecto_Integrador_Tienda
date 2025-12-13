@@ -2,9 +2,9 @@ import customtkinter as ctk
 from tkinter import ttk, BOTH, END
 from tkinter import messagebox
 import tkinter.font as tkFont
-from model import productos_model as pm
-# Asegúrate de importar la interfaz principal correctamente según tu estructura de carpetas
+
 from view import interfaz_principal 
+from controller import controller
 
 class productos:
 
@@ -12,12 +12,12 @@ class productos:
     def borrrarPantalla(ventana):
         for widget in ventana.winfo_children():
             widget.destroy()
-        # Asumo que esta función vuelve a pintar la barra de menú superior
+
         interfaz_principal.crear_menu_bar_Productos(ventana)
 
-    # --------------------------------------------------------------------------
-    # 1. CONSULTAR (YA EXISTENTE, LIGERAMENTE MEJORADO)
-    # --------------------------------------------------------------------------
+    
+    # 1. CONSULTAR 
+    
     @staticmethod
     def consultar(ventana):
         productos.borrrarPantalla(ventana)
@@ -25,7 +25,7 @@ class productos:
         titulo = ctk.CTkLabel(ventana, text="Listado de Productos", font=ctk.CTkFont(size=26, weight="bold"))
         titulo.pack(pady=20)
 
-        cursor = pm.productos.consultar()
+        cursor = controller.productos.consultar()
 
         if len(cursor) > 0:
             columnas = ("ID", "Nombre", "Categoria", "Precio Compra", "Precio Venta", "Stock", "Proveedor")
@@ -53,7 +53,7 @@ class productos:
 
             for item in cursor:
                 # Manejo seguro del proveedor por si devuelve lista vacía o tupla
-                prov_data = pm.productos.consultarProveedor(item[6])
+                prov_data = controller.productos.consultar_proveedor(item[6])
                 nombre_proveedor = prov_data[0][0] if prov_data and len(prov_data) > 0 else "Desc."
                 
                 fila = (item[0], item[1], item[2], item[3], item[4], item[5], nombre_proveedor)
@@ -61,9 +61,8 @@ class productos:
         else:
             ctk.CTkLabel(ventana, text="No hay datos para mostrar", font=ctk.CTkFont(size=16)).pack(pady=20)
 
-    # --------------------------------------------------------------------------
-    # 2. AGREGAR (NUEVO)
-    # --------------------------------------------------------------------------
+    
+    # 2. AGREGAR 
     @staticmethod
     def agregar(ventana):
         productos.borrrarPantalla(ventana)
@@ -97,7 +96,7 @@ class productos:
                     messagebox.showwarning("Advertencia", "Nombre y Categoría son obligatorios.")
                     return
 
-                exito = pm.productos.insertarProductos(nom, cat, pc, pv, stk, idp)
+                exito = controller.productos.agregar(nom,cat,pc,pv,stk,idp)
                 if exito:
                     messagebox.showinfo("Éxito", "Producto guardado correctamente.")
                     productos.consultar(ventana) # Ir a la lista
@@ -109,9 +108,8 @@ class productos:
         btn_guardar = ctk.CTkButton(ventana, text="Guardar Producto", fg_color="#2CC985", hover_color="#229A65", command=guardar_datos)
         btn_guardar.pack(pady=20)
 
-    # --------------------------------------------------------------------------
-    # 3. CAMBIAR / EDITAR (NUEVO)
-    # --------------------------------------------------------------------------
+    
+    # 3. CAMBIAR
     @staticmethod
     def cambiar(ventana):
         productos.borrrarPantalla(ventana)
@@ -144,7 +142,7 @@ class productos:
                 stk = int(entry_stock.get())
                 idp = int(entry_prov_id.get())
 
-                exito = pm.productos.actualizarProductos(nom, cat, pc, pv, stk, idp, id_prod)
+                exito = controller.productos.actualizar(nom,cat,pc,pv,stk,idp,id_prod)
                 if exito:
                     messagebox.showinfo("Éxito", "Producto actualizado correctamente.")
                     productos.consultar(ventana)
@@ -153,12 +151,12 @@ class productos:
             except ValueError:
                 messagebox.showerror("Error", "Verifique que los datos numéricos sean correctos.")
 
-        btn_actualizar = ctk.CTkButton(ventana, text="Actualizar Producto", fg_color="#FFA500", hover_color="#CC8400", command=actualizar_datos)
+        btn_actualizar = ctk.CTkButton(ventana, text="Actualizar Producto", fg_color="#007BFF", hover_color="#0024D9", command=actualizar_datos)
         btn_actualizar.pack(pady=20)
 
-    # --------------------------------------------------------------------------
-    # 4. BORRAR (NUEVO)
-    # --------------------------------------------------------------------------
+    
+    # 4. BORRAR 
+    
     @staticmethod
     def borrar(ventana):
         productos.borrrarPantalla(ventana)
@@ -176,7 +174,7 @@ class productos:
                 id_prod = int(entry_id.get())
                 confirm = messagebox.askyesno("Confirmar", f"¿Está seguro de eliminar el producto ID {id_prod}?")
                 if confirm:
-                    exito = pm.productos.eliminar(id_prod)
+                    exito = controller.productos.eliminar(id_prod)
                     if exito:
                         messagebox.showinfo("Éxito", "Producto eliminado.")
                         productos.consultar(ventana)
@@ -188,9 +186,9 @@ class productos:
         btn_eliminar = ctk.CTkButton(ventana, text="Eliminar Definitivamente", fg_color="#D32F2F", hover_color="#B71C1C", command=eliminar_datos)
         btn_eliminar.pack(pady=20)
 
-    # --------------------------------------------------------------------------
+    
     # HELPER: Para crear labels y entrys rápido
-    # --------------------------------------------------------------------------
+    
     @staticmethod
     def _crear_campo(parent, texto, fila):
         lbl = ctk.CTkLabel(parent, text=texto, font=("Arial", 14))

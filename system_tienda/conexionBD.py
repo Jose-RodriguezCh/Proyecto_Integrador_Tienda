@@ -5,7 +5,7 @@ try:
         host="127.0.0.1",
         user="root",
         password="",
-        database="bd_tienda_integradora"
+        database="bd_integradora_tienda"
     )
     cursor=conexion.cursor(buffered=True)
 except:

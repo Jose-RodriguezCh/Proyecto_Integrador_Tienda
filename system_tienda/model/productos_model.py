@@ -42,6 +42,16 @@ class productos:
             return False
     
     @staticmethod
+    def actualizarUno(id_producto,cantidad):
+        try:
+            cursor.execute("UPDATE productos SET stock=%s WHERE id_producto=%s",(cantidad,id_producto))
+            conexion.commit()
+            return True
+        except:
+            return False
+        
+
+    @staticmethod
     def eliminar(id):
         try:
             res=[]

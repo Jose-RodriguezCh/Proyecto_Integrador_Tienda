@@ -2,8 +2,9 @@ import customtkinter as ctk
 from tkinter import ttk, BOTH, END
 from tkinter import messagebox
 import tkinter.font as tkFont
-from model import proveedores_model as prm
+
 from view import interfaz_principal
+from controller import controller
 
 class proveedores:
 
@@ -11,12 +12,10 @@ class proveedores:
     def borrrarPantalla(ventana):
         for widget in ventana.winfo_children():
             widget.destroy()
-        # Se asume que esta función existe en tu interfaz principal
         interfaz_principal.crear_menu_bar_Provedores(ventana)
-
-    # --------------------------------------------------------------------------
+    
     # 1. CONSULTAR
-    # --------------------------------------------------------------------------
+   
     @staticmethod
     def consultar(ventana):
         proveedores.borrrarPantalla(ventana)
@@ -28,7 +27,7 @@ class proveedores:
         )
         titulo.pack(pady=20)
 
-        cursor = prm.proveedores.consultar()
+        cursor = controller.proveedores.consultar()
 
         if len(cursor) > 0:
             columnas = ("ID", "Nombre", "Telefono", "Direccion")
@@ -78,9 +77,9 @@ class proveedores:
         else:
             ctk.CTkLabel(ventana, text="No hay proveedores registrados.", font=ctk.CTkFont(size=16)).pack(pady=20)
 
-    # --------------------------------------------------------------------------
+   
     # 2. AGREGAR
-    # --------------------------------------------------------------------------
+ 
     @staticmethod
     def agregar(ventana):
         proveedores.borrrarPantalla(ventana)
@@ -95,7 +94,7 @@ class proveedores:
         form_frame = ctk.CTkFrame(ventana)
         form_frame.pack(pady=10, padx=20)
 
-        # Campos según tu modelo (Nombre, Telefono, Direccion)
+        
         entry_nombre = proveedores._crear_campo(form_frame, "Nombre:", 0)
         entry_telefono = proveedores._crear_campo(form_frame, "Teléfono:", 1)
         entry_direccion = proveedores._crear_campo(form_frame, "Dirección:", 2)
@@ -109,7 +108,7 @@ class proveedores:
                 messagebox.showwarning("Advertencia", "El campo Nombre es obligatorio.")
                 return
 
-            exito = prm.proveedores.insertarProveedor(nom, tel, dir_)
+            exito = controller.proveedores.agregar(nom,tel,dir_)
             
             if exito:
                 messagebox.showinfo("Éxito", "Proveedor guardado correctamente.")
@@ -126,9 +125,9 @@ class proveedores:
         )
         btn_guardar.pack(pady=20)
 
-    # --------------------------------------------------------------------------
+    
     # 3. CAMBIAR / EDITAR
-    # --------------------------------------------------------------------------
+   
     @staticmethod
     def cambiar(ventana):
         proveedores.borrrarPantalla(ventana)
@@ -159,8 +158,8 @@ class proveedores:
                 tel = entry_telefono.get()
                 dir_ = entry_direccion.get()
 
-                # Llamada al modelo: actualizar(nombre, telefono, direccion, id)
-                exito = prm.proveedores.actualizar(nom, tel, dir_, id_prov)
+               
+                exito = controller.proveedores.actualizar(nom,tel,dir_,id_prov)
 
                 if exito:
                     messagebox.showinfo("Éxito", "Proveedor actualizado correctamente.")
@@ -173,15 +172,15 @@ class proveedores:
         btn_actualizar = ctk.CTkButton(
             ventana, 
             text="Actualizar Proveedor", 
-            fg_color="#FFA500", 
-            hover_color="#CC8400", 
+            fg_color="#007BFF", 
+            hover_color="#0326D6", 
             command=actualizar_datos
         )
         btn_actualizar.pack(pady=20)
 
-    # --------------------------------------------------------------------------
+    
     # 4. BORRAR
-    # --------------------------------------------------------------------------
+    
     @staticmethod
     def borrar(ventana):
         proveedores.borrrarPantalla(ventana)
@@ -204,7 +203,7 @@ class proveedores:
                 confirm = messagebox.askyesno("Confirmar", f"¿Está seguro de eliminar al proveedor con ID {id_prov}?")
                 
                 if confirm:
-                    exito = prm.proveedores.eliminar(id_prov)
+                    exito = controller.proveedores.eliminar(id_prov)
                     if exito:
                         messagebox.showinfo("Éxito", "Proveedor eliminado.")
                         proveedores.consultar(ventana)
@@ -222,9 +221,9 @@ class proveedores:
         )
         btn_eliminar.pack(pady=20)
 
-    # --------------------------------------------------------------------------
+   
     # HELPER
-    # --------------------------------------------------------------------------
+    
     @staticmethod
     def _crear_campo(parent, texto, fila):
         lbl = ctk.CTkLabel(parent, text=texto, font=("Arial", 14))
